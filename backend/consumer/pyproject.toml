@@ -8,4 +8,5 @@ dependencies = [
     "fastapi>=0.120.2",
     "faststream>=0.6.2",
     "pydantic-config>=0.3.0",
+    "selenium>=4.38.0",
 ]
