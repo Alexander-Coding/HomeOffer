@@ -1,4 +1,4 @@
-import { object, string, number } from 'yup'
+import { object, string, number, mixed, boolean } from 'yup'
 
 import type { Schema} from 'yup'
 import type { IFlatFormValues } from '@features/flatForm'
@@ -54,7 +54,10 @@ export const flatSchema: Schema<IFlatFormValues> = object({
                 const { livingSquare, kitchenSquare } = this.parent as IFlatFormValues;
                 if (value === null || value === undefined) return true;
                 const sum = (Number(livingSquare) || 0) + (Number(kitchenSquare) || 0);
-                return Number(value) > sum;
+                return Number(value) >= sum;
             }
         ),
+
+    heatingType: mixed<'central' | 'gas' | 'electric'>().oneOf(['central', 'gas', 'electric']).required(),
+    hasBalcony:  boolean().required(),
 });

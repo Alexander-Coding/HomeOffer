@@ -1,3 +1,5 @@
+type THeatingType = 'central' | 'gas' | 'electric';
+
 // Интерфейс для значений формы данных о квартире
 export interface IFlatFormValues {
     name:          string;       // Название объекта
@@ -7,4 +9,6 @@ export interface IFlatFormValues {
     square:        number | '';  // Общая площадь
     livingSquare:  number | '';  // Жилая площадь
     kitchenSquare: number | '';  // Площадь кухни
+    heatingType:  THeatingType;  // Тип отопления
+    hasBalcony:   boolean;       // Наличие балкона
 }
