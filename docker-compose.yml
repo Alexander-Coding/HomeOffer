@@ -1,0 +1,151 @@
+name: avito-browse-pipeline
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    restart: unless-stopped
+    networks:
+      - internal
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  selenium-hub:
+    image: selenium/hub:4.25.0
+    container_name: selenium-hub
+    networks:
+      - internal
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:4444/status" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  chrome-node-1:
+    image: selenium/node-chrome:4.25.0
+    container_name: chrome-node-1
+    shm_size: 2gb
+    depends_on:
+      selenium-hub:
+        condition: service_healthy
+    environment:
+      - SE_EVENT_BUS_HOST=${SE_EVENT_BUS_HOST}
+      - SE_EVENT_BUS_PUBLISH_PORT=${SE_EVENT_BUS_PUBLISH_PORT}
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=${SE_EVENT_BUS_SUBSCRIBE_PORT}
+      - SE_NODE_MAX_SESSIONS=${SE_NODE_MAX_SESSIONS}
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=${SE_NODE_OVERRIDE_MAX_SESSIONS}
+    networks:
+      - internal
+
+  chrome-node-2:
+    image: selenium/node-chrome:4.25.0
+    container_name: chrome-node-2
+    shm_size: 2gb
+    depends_on:
+      selenium-hub:
+        condition: service_healthy
+    environment:
+      - SE_EVENT_BUS_HOST=${SE_EVENT_BUS_HOST}
+      - SE_EVENT_BUS_PUBLISH_PORT=${SE_EVENT_BUS_PUBLISH_PORT}
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=${SE_EVENT_BUS_SUBSCRIBE_PORT}
+      - SE_NODE_MAX_SESSIONS=${SE_NODE_MAX_SESSIONS}
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=${SE_NODE_OVERRIDE_MAX_SESSIONS}
+    networks:
+      - internal
+
+  api:
+    build:
+      context: ./backend/api
+    container_name: api
+    env_file:
+      - .env
+    environment:
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASS=${RABBITMQ_PASS}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+      - RABBITMQ_PORT=${RABBITMQ_PORT}
+      - QUEUE_NAME=${QUEUE_NAME}
+      - EXCHANGE_NAME=${EXCHANGE_NAME}
+      - ROUTING_KEY=${ROUTING_KEY}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    networks:
+      - internal
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  consumer:
+    build:
+      context: ./backend/consumer
+    container_name: consumer
+    env_file:
+      - .env
+    environment:
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASS=${RABBITMQ_PASS}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+      - RABBITMQ_PORT=${RABBITMQ_PORT}
+      - QUEUE_NAME=${QUEUE_NAME}
+      - EXCHANGE_NAME=${EXCHANGE_NAME}
+      - ROUTING_KEY=${ROUTING_KEY}
+      - SELENIUM_HUB_URL=${SELENIUM_HUB_URL}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - PAGE_LOAD_TIMEOUT=${PAGE_LOAD_TIMEOUT}
+      - SCRIPT_TIMEOUT=${SCRIPT_TIMEOUT}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      selenium-hub:
+        condition: service_healthy
+      chrome-node-1:
+        condition: service_started
+      chrome-node-2:
+        condition: service_started
+    networks:
+      - internal
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    restart: unless-stopped
+
+    ports:
+      - "80:80"
+
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+
+    networks:
+      - internal
+
+    depends_on:
+      - frontend
+      - api
+
+networks:
+  internal:
+    driver: bridge
