@@ -1,9 +1,16 @@
-from .rabbitmq import app_stream, start_rabbitmq, stop_rabbitmq, broker
+from .rabbitmq import (
+    app_stream,
+    start_rabbitmq,
+    stop_rabbitmq,
+    broker,
+    publish_browse_task
+)
 
 
 __all__ = [
     'app_stream',
     'start_rabbitmq',
     'stop_rabbitmq',
-    'broker'
+    'broker',
+    'publish_browse_task',
 ]

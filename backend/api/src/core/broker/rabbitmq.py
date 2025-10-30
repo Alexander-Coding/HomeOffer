@@ -41,9 +41,23 @@ async def stop_rabbitmq() -> None:
     logger.info("RabbitMQ connection closed.")
 
 
+async def publish_browse_task(url: str):
+    payload = {"url": url}
+
+    await broker.publish(
+        payload,
+        exchange=exchange,
+        routing_key=config.ROUTING_KEY,
+        content_type="application/json"
+    )
+
+    logger.info(f"Task published to {config.EXCHANGE_NAME}:{config.ROUTING_KEY} -> {url}")
+
+
 __all__ = [
     'app_stream',
     'start_rabbitmq',
     'stop_rabbitmq',
-    'broker'
+    'broker',
+    'publish_browse_task'
 ]
