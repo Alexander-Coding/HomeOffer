@@ -5,6 +5,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
+from src.api import api_router
 from src.core import start_rabbitmq, stop_rabbitmq
 
 load_dotenv()
@@ -30,6 +31,13 @@ app.add_middleware(
 )
 
 app.add_middleware(GZipMiddleware, minimum_size=50)
+
+app.include_router(api_router)
+
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
 
 
 def custom_openapi():
