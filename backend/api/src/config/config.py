@@ -17,6 +17,11 @@ class Config(BaseSettings):
     PAGE_LOAD_TIMEOUT: int
     SCRIPT_TIMEOUT:    int
 
+    @property
+    def rabbitmq_url_amqp(self):
+        """Получение ссылки на подключение к брокеру сообщений RabbitMQ через amqp (асинхронно)"""
+        return f"amqp://{self.RABBITMQ_USER}:{self.RABBITMQ_PASS}@{self.RABBITMQ_HOST}:{self.RABBITMQ_PORT}"
+
 
 config = Config()
 
