@@ -18,17 +18,27 @@ def get_driver() -> webdriver.Remote:
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920,1080")
-
-    caps = DesiredCapabilities.CHROME.copy()
-    caps["se:recordVideo"] = False
+    chrome_options.add_argument("--lang=ru-RU")
+    chrome_options.add_argument(
+        '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+        'AppleWebKit/537.36 (KHTML, like Gecko) '
+        'Chrome/127.0.0.0 Safari/537.36'
+    )
+    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    chrome_options.add_experimental_option("useAutomationExtension", False)
+    chrome_prefs = {
+        "intl.accept_languages": "ru-RU,ru",
+    }
+    chrome_options.add_experimental_option("prefs", chrome_prefs)
 
     driver = webdriver.Remote(
-        command_executor=f"{config.SELENIUM_HUB_URL}/wd/hub",
+        command_executor=f"{config.SELENIUM_HUB_URL}",
         options=chrome_options,
-        desired_capabilities=caps
     )
+
     driver.set_page_load_timeout(config.PAGE_LOAD_TIMEOUT)
     driver.set_script_timeout(config.SCRIPT_TIMEOUT)
+
     return driver
 
 
