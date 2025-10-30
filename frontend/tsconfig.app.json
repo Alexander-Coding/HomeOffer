@@ -22,7 +22,22 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    /* Alias */
+    "baseUrl": "./src",
+    "paths": {
+      "@root/*":     ["./*"],
+      "@features/*": ["./features/*"],
+        "@features": ["./features/index.ts"],
+      "@layouts/*":  ["./layouts/*"],
+        "@layouts":  ["./layouts/index.ts"],
+      "@pages/*":    ["./pages/*"],
+        "@pages":    ["./pages/index.ts"],
+      "@shared/*":   ["./shared/*"],
+        "@shared":   ["./shared/index.ts"],
+    }
   },
-  "include": ["src"]
+  "include": ["src", "src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
