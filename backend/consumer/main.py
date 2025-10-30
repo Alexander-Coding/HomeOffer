@@ -6,14 +6,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from src.core import start_rabbitmq, stop_rabbitmq
+from src.services.avito_service import start_consumer
 
 load_dotenv()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    start_consumer()
     await start_rabbitmq()
-
+    
     yield
 
     await stop_rabbitmq()
@@ -30,8 +32,6 @@ app.add_middleware(
 )
 
 app.add_middleware(GZipMiddleware, minimum_size=50)
-
-app.include_router(api_router)
 
 
 @app.get("/health")

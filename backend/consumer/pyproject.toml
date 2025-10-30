@@ -6,7 +6,8 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.120.2",
-    "faststream>=0.6.2",
+    "faststream[rabbit]>=0.6.2",
     "pydantic-config>=0.3.0",
     "selenium>=4.38.0",
+    "uvicorn>=0.38.0",
 ]

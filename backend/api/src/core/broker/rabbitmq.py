@@ -12,13 +12,13 @@ app_stream = FastStream(broker)
 
 
 exchange = RabbitExchange(
-    config.EXCHANGE_NAME,
-    type=ExchangeType.TOPIC,
+    name=config.EXCHANGE_NAME,
+    type=ExchangeType.DIRECT,
     durable=True,
 )
 
 queue = RabbitQueue(
-    config.QUEUE_NAME,
+    name=config.QUEUE_NAME,
     durable=True,
     routing_key=config.ROUTING_KEY,
 )
@@ -30,6 +30,8 @@ async def start_rabbitmq() -> None:
 
     await broker.declare_exchange(exchange)
     await broker.declare_queue(queue)
+
+    await broker.start()
 
     logger.info("RabbitMQ setup completed.")
 

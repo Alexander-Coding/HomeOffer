@@ -1,8 +1,8 @@
-from pydantic import BaseModel, HttpUrl, field_validator
+from pydantic import BaseModel, field_validator
 
 
 class BrowseRequest(BaseModel):
-    url: HttpUrl
+    url: str
 
     @field_validator("url")
     @classmethod

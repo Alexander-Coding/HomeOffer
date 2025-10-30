@@ -16,6 +16,10 @@ class Config(BaseSettings):
     LOG_LEVEL:         str
     PAGE_LOAD_TIMEOUT: int
     SCRIPT_TIMEOUT:    int
+    
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
 
     @property
     def rabbitmq_url_amqp(self):

@@ -10,12 +10,12 @@ class Config(BaseSettings):
     QUEUE_NAME:    str
     EXCHANGE_NAME: str
     ROUTING_KEY:   str
+    
+    LOG_LEVEL:     str
 
-    SELENIUM_HUB_URL: str
-
-    LOG_LEVEL:         str
-    PAGE_LOAD_TIMEOUT: int
-    SCRIPT_TIMEOUT:    int
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
 
     @property
     def rabbitmq_url_amqp(self):

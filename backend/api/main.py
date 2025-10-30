@@ -1,3 +1,6 @@
+import os
+import sys
+
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
@@ -7,6 +10,10 @@ from contextlib import asynccontextmanager
 
 from src.api import api_router
 from src.core import start_rabbitmq, stop_rabbitmq
+
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
 
 load_dotenv()
 
