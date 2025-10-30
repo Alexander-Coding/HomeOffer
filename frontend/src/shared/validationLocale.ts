@@ -2,7 +2,7 @@ import { setLocale } from 'yup'
 
 
 // Установка русской локализации для сообщений об ошибках валидации
-export const setRussianLocale = () => setLocale({
+setLocale({
     mixed: {
         required: 'Поле обязательно для заполнения',
     },
@@ -15,4 +15,5 @@ export const setRussianLocale = () => setLocale({
         min: ({ min }) => `Значение не может быть меньше ${min} символов`,
         max: ({ max }) => `Значение не может быть больше ${max} символов`,
     },
+
 })
